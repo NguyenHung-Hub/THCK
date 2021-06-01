@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Thuc Hanh CK</title>
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script>
+        $(document).ready(function () {
+            $("#txtName").blur(regexName)
+
+            function regexName() {
+                var txtname = $("#txtName").val();
+                var regexname = /^([A-Z]{1}[a-z]*\s)+([A-Z]{1}[a-z]*){1}$/;
+
+                if (regexname.test(txtname)) {
+                    $("#errorName").text('(*)');
+                    $("#errorForm").text('');
+
+                    return true;
+                } else {
+                    $("#errorName").text('Nhập tên không đúng.');
+                    return false;
+                }
+            }
+
+
+            var listRoomType = [
+                ['Luxury', 1200000],
+                ['Superior', 1500000],
+                ['View Sea', 1900000],
+                ['Pool view', 1700000]
+            ];
+
+            for (let i = 0; i < listRoomType.length; i++) {
+                $("#txtRoomType").append('<option value="' + listRoomType[i][0] + '">' + listRoomType[i][0] + '</option>');
+
+            }
+
+            $("#txtRoomPrice").val(listRoomType[0][1]);
+            $("#txtRoomType").click(function () {
+
+                var room = $("#txtRoomType").val();
+
+                for (let i = 0; i < listRoomType.length; i++) {
+                    if (listRoomType[i][0] == room) {
+                        $("#txtRoomPrice").val(listRoomType[i][1]);
+                        break;
+                    }
+
+                }
+            })
+
+
+            // var come = $("#txtDateCome").val();
+            // var go = $("#txtDateGo").val();
+            // var d1 = new Date(2013, 06, 5);
+            // var d2 = new Date(2013, 06, 2);
+
+            // if (d1 < d2) {
+            //     console.log("d1 nho")
+            // }
+            // if (come < go) {
+            //     console.log("come nho")
+            // }
+
+            // var d = d2.getTime() - d1.getTime()
+            console.log($("#txtDateCome").val())
+
+            $("#txtDateCome").blur(function () {
+                var d1 = new Date($("#txtDateCome").val());
+                var d2 = new Date($("#txtDateGo").val());
+                var d = d2.getTime() - d1.getTime()
+
+                var numberDay = d / 86400000;
+
+                if (numberDay < 1) {
+                    $("#errorDateCome").text('Ngày đến phải trước ngày đi');
+                } else {
+                    // $("#txtNumberDay").val(numberDay);
+                    $("#errorDateCome").text('(*)');
+                }
+
+                if ($("#txtDateCome").val() != '' && $("#txtDateGo").val() != '' && numberDay > 0) {
+                    $("#txtNumberDay").val(numberDay);
+                }
+            })
+            $("#txtDateGo").blur(function () {
+                var d1 = new Date($("#txtDateCome").val());
+                var d2 = new Date($("#txtDateGo").val());
+                var d = d2.getTime() - d1.getTime()
+
+                var numberDay = d / 86400000;
+
+                // if ($("#txtDateCome").val() == '') {
+                //     console.log("sai")
+                // }
+
+                if (numberDay < 1) {
+                    $("#errorDateGo").text('Ngày đi phải sau ngày đến');
+                } else {
+                    // $("#txtNumberDay").val(numberDay);
+                    $("#errorDateGo").text('(*)');
+                }
+
+                if ($("#txtDateCome").val() != '' && $("#txtDateGo").val() != '' && numberDay > 0) {
+                    $("#txtNumberDay").val(numberDay);
+                }
+            })
+
+
+
+            $("#btnSignUp").click(function () {
+                if (!regexName()) {
+                    $("#errorForm").text('Vui lòng điền đầy đủ thông tin.');
+                    return false;
+                }
+
+                var name = $("#txtName").val();
+                var dateCome = $("#txtDateCome").val();
+                var dateGo = $("#txtDateGo").val();
+                var days = $("#txtNumberDay").val();
+                var roomType = $("#txtRoomType").val();
+                // var roomPrice = $("#txtRoomPrice").val();
+                var service = $('input[type="checkbox"]:checked').val();
+
+                var services = [];
+                $.each($('input[name="chkService"]:checked'), function () {
+                    services.push($(this).val())
+                    console.log($(this).val())
+                })
+
+                var d1 = new Date(dateCome);
+                var d2 = new Date(dateGo);
+                var d = d2.getTime() - d1.getTime()
+                var numberDay = d / 86400000;
+
+
+                var price_room = 0;
+                for (let i = 0; i < listRoomType.length; i++) {
+                    if (listRoomType[i][0] == roomType) {
+                        price_room = listRoomType[i][1];
+                    }
+
+                }
+
+                var total_price = numberDay * price_room + services.length * 200000;
+
+                var newRow =
+                    '<tr>'
+                    + '<td>' + name + '</td>'
+                    + '<td>' + dateCome + '</td>'
+                    + '<td>' + dateGo + '</td>'
+                    + '<td>' + days + '</td>'
+                    + '<td>' + roomType + '</td>'
+                    + '<td>' + services + '</td>'
+                    + '<td>' + total_price + '</td>'
+                    + '</tr>';
+
+                $("#tableRoom").append(newRow);
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <header>
+        <h1>Pandaus Resort</h1>
+        <h2>Dat phong online</h2>
+    </header>
+
+
+    <div class="content">
+        <div class="container-form">
+            <div class="row form-group">
+                <label for="txtName" class="col-3">Ho ten nguoi dat</label>
+                <div class="col-9">
+                    <input type="text" name="txtName" id="txtName" class="form-control" placeholder="Hoang"
+                        aria-describedby="helpId" required>
+                    <div id="errorName" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtDateCome" class="col-3">Ngay den</label>
+                <div class="col-9">
+                    <input type="date" name="txtDateCome" id="txtDateCome" class="form-control"
+                        aria-describedby="helpId" required>
+                    <div id="errorDateCome" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtDateGo" class="col-3">Ngay di</label>
+                <div class="col-9">
+                    <input type="date" name="txtDateGo" id="txtDateGo" class="form-control" aria-describedby="helpId">
+                    <div id="errorDateGo" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtNumberDay" class="col-3">So ngay</label>
+                <div class="col-9">
+                    <input type="text" name="txtNumberDay" id="txtNumberDay" class="form-control"
+                        aria-describedby="helpId">
+                    <div id="errorNumberDay" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtRoomType" class="col-3">Loai phong</label>
+                <div class="col-9">
+                    <div class="form-group">
+                        <select class="form-control" name="txtRoomType" id="txtRoomType">
+                            <!-- <option value=""></option> -->
+                        </select>
+                    </div>
+                    <div id="errorRoomType" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtRoomPrice" class="col-3">Gia phong</label>
+                <div class="col-9">
+                    <input type="number" name="txtRoomPrice" id="txtRoomPrice" class="form-control"
+                        aria-describedby="helpId" readonly>
+                    <div id="errorRoomPrice" class="text-danger">(*)</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtService" class="col-3">Dich vu</label>
+                <div class="col-9">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="chkService" id="chkLaundry"
+                                value="Giat ui">
+                            Giat ui
+                        </label>
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="chkService" id="chkTaxi"
+                                value="Xe dua ruoc">
+                            Xe dua ruoc
+                        </label>
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="chkService" id="chkBreakfast"
+                                value="An sang tai phong">
+                            An sang tai phong
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label for="txtService" class="col-3"></label>
+
+                <div class="col-9">
+                    <input type="button" class="btn btn-success" id="btnSignUp" value="Dang ki">
+                    <div id="errorForm" class="text-danger"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container-img">
+            <img src="../img/PIC.JPG" alt="">
+        </div>
+    </div>
+
+    <table class="table table-bordered" id="tableRoom">
+        <h1>Phieu thanh toan</h1>
+        <thead>
+            <tr>
+                <th>Ho ten nguoi dat</th>
+                <th>Ngay di</th>
+                <th>Ngay den</th>
+                <th>So ngay</th>
+                <th>Loai phong</th>
+                <th>Dich vu</th>
+                <th>Tong chi phi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+                <td scope="row"></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td scope="row"></td>
+                <td></td>
+                <td></td>
+            </tr> -->
+
+
+        </tbody>
+    </table>
+</body>
+
+</html>
